@@ -107,6 +107,14 @@ in
       ];
     };
 
+    systemd.tmpfiles.rules = [
+      "d ${cfg.logDir} - nginx nginx"
+    ];
+    systemd.services.nginx.serviceConfig.ReadWritePaths = [
+      cfg.logDir
+      cfg.cacheDir
+    ];
+
     networking.firewall.allowedTCPPorts = [ 80 443 ];
   };
 }

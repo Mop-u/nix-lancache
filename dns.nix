@@ -44,6 +44,11 @@ in
         description = "IP of cache server to advertise via DNS";
         type = with types; str;
       };
+      cacheNetworks = mkOption {
+        description = "Subnets to listen to for DNS requests";
+        type = with types; listOf str;
+        default = [ "192.168.0.0/16" "127.0.0.0/24" "10.10.0.0/24" ];
+      };
       adminDomain = mkOption {
         description = "The administrative domain for the DNS server";
         type = with types; str;
@@ -56,7 +61,7 @@ in
     services.bind = {
       enable = true;
       forwarders = cfg.forwarders;
-      cacheNetworks = [ "192.168.0.0/16" "127.0.0.0/24" "10.10.0.0/24" ];
+      cacheNetworks = cfg.cacheNetworks;
       zones = listToAttrs (map (d: { name = d; value = { master = true; file = zonefile; }; }) (domains ++ [ cfg.adminDomain ]));
     };
 
