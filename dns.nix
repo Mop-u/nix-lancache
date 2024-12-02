@@ -16,20 +16,20 @@ let
     ));
 
   ip = cfg.cacheIp;
-  zonefile = toFile "zonefile" "
-\$TTL    600
-@       IN  SOA ns1 dns.lancache.net. (
-            ${substring 0 8 cache-domains.lastModifiedDate}
-            604800
-            600
-            600
-            600 )
-@       IN  NS  ns1
-ns1     IN  A   ${ip}
+  zonefile = toFile "zonefile" ''
+    $TTL    600
+    @       IN  SOA ns1 dns.lancache.net. (
+                ${substring 0 8 cache-domains.lastModifiedDate}
+                604800
+                600
+                600
+                600 )
+    @       IN  NS  ns1
+    ns1     IN  A   ${ip}
 
-@       IN  A   ${ip}
-*       IN  A   ${ip}
-";
+    @       IN  A   ${ip}
+    *       IN  A   ${ip}
+  '';
 in
 {
   options = {
@@ -44,6 +44,11 @@ in
         description = "IP of cache server to advertise via DNS";
         type = with types; str;
       };
+      cacheNetworks = mkOption {
+        description = "Subnets to listen to for DNS requests";
+        type = with types; listOf str;
+        default = [ "192.168.0.0/16" "127.0.0.0/24" ];
+      };
     };
   };
 
@@ -51,7 +56,7 @@ in
     services.bind = {
       enable = true;
       forwarders = cfg.forwarders;
-      cacheNetworks = [ "192.168.0.0/16" "127.0.0.0/24" ];
+      cacheNetworks = cfg.cacheNetworks;
       zones = listToAttrs (map (d: { name = d; value = { master = true; file = zonefile; }; }) (domains));
     };
 

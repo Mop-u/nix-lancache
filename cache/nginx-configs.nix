@@ -11,9 +11,11 @@ let
     UPSTREAM_DNS = concatStringsSep " " cfg.resolvers;
     MIN_FREE_DISK = cfg.minFreeDisk;
     LOG_FORMAT = cfg.logFormat;
-    "/data/cache/cache" = cfg.cacheDir;
+    "/data/cache/" = cfg.cacheDir + "/";
     "/data/logs" = cfg.logDir;
+    "/data/cachedomains" = cfg.cacheDir + "/cachedomains";
     "listen 80 reuseport;" = "listen 80 reuseport default_server;";
+    "listen [::]:80 reuseport;" = "listen [::]:80 reuseport default_server;";
   };
 
   replacementFlags = concatStringsSep " " (lib.attrsets.mapAttrsToList (k: v: "--replace \"${k}\" \"${v}\"") replacements);

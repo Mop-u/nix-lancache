@@ -99,6 +99,16 @@ in
       '';
     };
 
+    systemd.tmpfiles.rules = [
+      "d /var/log/lancache - nginx nginx"
+    ];
+    systemd.services.nginx.serviceConfig.ReadWritePaths = [
+      "/var/log/lancache"
+      "${cfg.cacheDir}/cache"
+      "${cfg.cacheDir}/cache/cache"
+      "${cfg.cacheDir}/cachedomains"
+    ];
+
     networking.firewall.allowedTCPPorts = [ 80 443 ];
   };
 }
