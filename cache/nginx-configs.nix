@@ -9,8 +9,14 @@ let
     CACHE_SLICE_SIZE = cfg.cacheSliceSize;
     NGINX_WORKER_PROCESSES = cfg.nginxWorkerProcesses;
     UPSTREAM_DNS = concatStringsSep " " cfg.resolvers;
-    "/data/cache/cache" = cfg.cacheDir;
+    MIN_FREE_DISK = cfg.minFreeDisk;
+    "LOG_FORMAT;" = "cachelog;";
+    "/data/logs" = "/var/log/lancache";
+    "/data/cache/" = cfg.cacheDir + "/";
+    "/data/cachedomains" = cfg.cacheDir + "/cachedomains";
     "listen 80 reuseport;" = "listen 80 reuseport default_server;";
+    "listen [::]:80 reuseport;" = "listen [::]:80 reuseport default_server;";
+    #"ipv6=off;" = ";";
   };
 
   replacementFlags = concatStringsSep " " (lib.attrsets.mapAttrsToList (k: v: "--replace \"${k}\" \"${v}\"") replacements);

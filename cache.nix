@@ -33,6 +33,11 @@ in
         type = with types; str;
         default = "500m";
       };
+      minFreeDisk = mkOption {
+        description = "Sets the minimum free disk space that must be kept at all times. When the available free space drops below the set amount for any reason, the cache server will begin pruning content to free up space. Specified in gigabytes.";
+        type = with types; str;
+        default = "10g";
+      };
       cacheMaxAge = mkOption {
         description = "The maximum amount of time a file should be held in cache. There is usually no reason to reduce this - the cache will automatically remove the oldest content if it needs the space.";
         type = with types; str;
@@ -83,6 +88,16 @@ in
         include ${nginxConfigs}/nginx/stream-available/*;
       '';
     };
+
+    systemd.tmpfiles.rules = [
+      "d /var/log/lancache - nginx nginx"
+    ];
+    systemd.services.nginx.serviceConfig.ReadWritePaths = [
+      "/var/log/lancache"
+      "${cfg.cacheDir}/cache"
+      "${cfg.cacheDir}/cache/cache"
+      "${cfg.cacheDir}/cachedomains"
+    ];
 
     networking.firewall.allowedTCPPorts = [ 80 443 ];
   };
